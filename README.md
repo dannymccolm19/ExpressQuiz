@@ -1,5 +1,5 @@
 # ExpressQuiz
-This is a Quiz application created by me using react.
+This is a Quiz application created by me using express.
 
 # To run 
 run 'npm install' and then 'node index.js' in the terminal while in the project directory.
