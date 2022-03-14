@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+</head>
+<body>
+    <h1>Quiz</h1>
+    <input type= "button" onclick="getQuestions()" value="Start Quiz">
+    <div id='quesDiv'></div>
+    <div id='ansDiv'></div>
+</body>
+<script>
+    
+    function getQuestions()
+    {   
+        let xReq = new XMLHttpRequest();
+        xReq.onreadystatechange = displayQuestions;
+
+        xReq.open('GET','/questionsInJson',true);
+        xReq.send();
+    }
+
+    function displayQuestions()
+    {
+        if (this.readyState == 4 && this.status == 200)
+        {
+            let quesDiv = document.getElementById('quesDiv');
+            let questionList = JSON.parse(this.responseText);
+            let content =''
+        
+            content += '<br>'
+            let x =0;
+            for (q of questionList)
+            {
+                x++;
+                content += '<div>';
+                content += q.stem + '<br>'
+                for (let i = 0; i <q.options.length; i++){
+                    
+                    content += '<br>' 
+                    content += `<input type="radio" id="ques${x}opt${i}" name= "ques${x}" value="ques${x}opt${i}" onclick="getAnswer(${i}, ${q.answerIndex}, ${x})">`
+                    content += `<label for="ques${x}opt${i}"}>${q.options[i]}</label><br>`
+                    
+                }
+                content += '</div>'
+                content += '<br>'
+                content += `<div id='respDiv${x}'></div>`
+                content += '<br>'
+            }
+            content += `<input type="button" onclick = "mark(${x})" value="Submit">`
+            
+
+
+            quesDiv.innerHTML = content;
+        }
+    }
+
+    function getAnswer(o, a, x){
+        let respDiv = document.getElementById(`respDiv${x}`)
+        if (o == a){
+            respDiv.innerHTML ="Your answer is correct!"
+        }
+        else{
+            respDiv.innerHTML  = "Your answer is incorrect. Please try again"
+        }
+    }
+
+
+    function mark()
+    {   
+        let xReq = new XMLHttpRequest();
+        xReq.onreadystatechange = displayMark;
+
+        xReq.open('GET','/questionsInJson',true);
+        xReq.send();
+    }
+
+    function displayMark(){
+        if (this.readyState == 4 && this.status == 200)
+        {
+            let ansDiv = document.getElementById('ansDiv')
+            let questionList = JSON.parse(this.responseText);
+            let content ='';
+            let x =0
+            let g = 0
+            for (q of questionList){
+                x++
+      
+                for (let i = 0; i <q.options.length; i++){
+                    let opt = document.getElementById(`ques${x}opt${i}`)
+                    if(opt.checked){
+                        if (i == q.answerIndex){
+                            g++
+                        }
+                    }
+                    
+                }
+            }
+            content += '<br>Your mark is:<br><br>'
+            content += g + "/" + x
+            content += " = " + g/x*100 + "%"
+            ansDiv.innerHTML = content;
+        }
+    }
+</script>
+</html>
